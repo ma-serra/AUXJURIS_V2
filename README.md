@@ -16,7 +16,25 @@
 
 ---
 
-## 🚀 Como Baixar, Instalar e Executar o AuxJuris Localmente
+## 🚀 Como Executar o AuxJuris V2
+
+### 🌐 Execução no GitHub Spaces (Recomendado para Testes)
+
+Para usar o AuxJuris V2 diretamente no navegador sem instalação local:
+
+1. **Abrir no GitHub Codespaces**:
+   - Vá até o repositório no GitHub
+   - Clique no botão verde "Code"
+   - Selecione a aba "Codespaces"
+   - Clique em "Create codespace on main"
+
+2. **Configuração Automática**: O ambiente será configurado automaticamente
+3. **Configurar API Key**: Adicione sua chave da API do Google Gemini em `backend/.env`
+4. **Iniciar Aplicação**: Execute `./start-all.sh` ou `npm run dev:unix`
+
+📋 **[Guia Completo para GitHub Spaces](GITHUB_SPACES.md)**
+
+### 💻 Instalação Local
 
 Para configurar e rodar o AuxJuris V2 em sua máquina local, siga os passos abaixo:
 

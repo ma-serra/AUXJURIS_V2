@@ -8,11 +8,15 @@
     "dev:frontend": "vite",
     "dev:backend": "cd backend && npm run dev",
     "dev:all": "start cmd /k \"npm --prefix backend run dev\" && start cmd /k \"npm run dev:frontend\"",
+    "dev:unix": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "vite build",
     "build:backend": "cd backend && npm run build",
     "preview": "vite preview",
-    "install:backend": "cd backend && npm install"
+    "start": "npm run build && node backend/dist/server.js",
+    "install:backend": "cd backend && npm install",
+    "setup": "npm install && npm run install:backend",
+    "codespaces": "bash .devcontainer/setup.sh && npm run dev:unix"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.1.0",

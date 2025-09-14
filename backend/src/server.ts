@@ -32,7 +32,7 @@ const loadEnvFile = () => {
 loadEnvFile();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = Number(process.env.PORT) || 3001;
 console.log(`[DEBUG] Porta configurada para o backend: ${port}`);
 
 // Middleware global de log de requisições
@@ -42,7 +42,34 @@ app.use((req, res, next) => {
 });
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost, GitHub Codespaces, and preview URLs
+    const allowedOrigins = [
+      /^https?:\/\/localhost(:\d+)?$/,
+      /^https?:\/\/127\.0\.0\.1(:\d+)?$/,
+      /^https:\/\/.*\.github\.dev$/,
+      /^https:\/\/.*\.githubpreview\.dev$/,
+      /^https:\/\/.*\.preview\.app\.github\.dev$/,
+      /^https:\/\/.*-5173\.app\.github\.dev$/,
+      /^https:\/\/.*\.codespaces\.githubusercontent\.com$/
+    ];
+    
+    const isAllowed = allowedOrigins.some(pattern => pattern.test(origin));
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(null, true); // Allow all for now - can be restricted later
+    }
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use((req, res, next) => {
   console.log(`[CORS DEBUG] Requisição para ${req.url} após CORS middleware. Origin: ${req.headers.origin}`);
   next();
@@ -1200,9 +1227,10 @@ app.delete('/api/documents/:filename', async (req: Request<{ filename: string }>
   }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor backend rodando em http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Servidor backend rodando em http://0.0.0.0:${port}`);
   console.log(`DEBUG: Servidor tentando escutar na porta: ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 app.post('/api/gerar-minuta', async (req: Request, res: Response) => {
