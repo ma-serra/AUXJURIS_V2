@@ -1,0 +1,54 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm install
+        cd backend && npm install
+    
+    - name: Build frontend
+      run: npm run build:frontend
+    
+    - name: Build backend  
+      run: npm run build:backend
+    
+    - name: Install Qdrant (for testing)
+      run: |
+        wget -q https://github.com/qdrant/qdrant/releases/download/v1.7.4/qdrant-x86_64-unknown-linux-gnu.tar.gz
+        tar -xzf qdrant-x86_64-unknown-linux-gnu.tar.gz
+        sudo mv qdrant /usr/local/bin/
+    
+    - name: Create test environment
+      run: |
+        mkdir -p storage
+        mkdir -p public/books/uploads/extraidos
+        cp backend/.env.example backend/.env
+    
+    - name: Test Qdrant startup
+      run: |
+        echo "Testing Qdrant startup..."
+        ./startup.sh
+        
+    - name: Test builds exist
+      run: |
+        test -d backend/dist || exit 1
+        test -d dist || exit 1
+        echo "✅ All builds completed successfully"
